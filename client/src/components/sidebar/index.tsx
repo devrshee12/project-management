@@ -51,7 +51,7 @@ const Sidebar = () => {
   };
 
   if (!currentUser) {
-    return <div>Could not find user</div>;
+    return null;
   }
   return (
     <div className={sidebarClassNames}>
