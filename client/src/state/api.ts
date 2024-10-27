@@ -1,3 +1,4 @@
+/* eslint-disable  @typescript-eslint/no-explicit-any */
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { getCurrentUser, fetchAuthSession } from "aws-amplify/auth";
 
@@ -96,13 +97,11 @@ export const api = createApi({
           const session = await fetchAuthSession();
           if (!session) throw new Error("No session found");
           const { userSub } = session;
-          const { accessToken } = session.tokens ?? {};
-
           const userDetailsResponse = await fetchWithBQ(`users/${userSub}`);
           const userDetails = userDetailsResponse.data as User;
           return { data: { user, userSub, userDetails } };
-        } catch (err: any) {
-          return { error: err.message || "Could not found user!" };
+        } catch (error: any) {
+          return { error: error?.message || "Could not found user!" };
         }
       },
     }),
