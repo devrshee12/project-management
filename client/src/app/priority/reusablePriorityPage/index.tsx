@@ -1,91 +1,97 @@
-"use client"
+"use client";
 import { useAppSelector } from "@/app/redux";
 import Header from "@/components/header/Header";
 import ModalNewTask from "@/components/ModalNewTask";
 import TaskCard from "@/components/taskCard/TaskCard";
 import { dataGridClassNames, dataGridSxStyles } from "@/lib/utils";
-import { Priority, Task, useGetTasksByUserQuery } from "@/state/api";
+import {
+  Priority,
+  Task,
+  useGetAuthUserQuery,
+  useGetTasksByUserQuery,
+} from "@/state/api";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import React, { useState } from "react";
 
 type Props = {
-    priority: Priority
+  priority: Priority;
 };
 
 const columns: GridColDef[] = [
-    {
-      field: "title",
-      headerName: "Title",
-      width: 100,
-    },
-    {
-      field: "description",
-      headerName: "Description",
-      width: 200,
-    },
-    {
-      field: "status",
-      headerName: "Status",
-      width: 130,
-      renderCell: (params) => (
-        <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
-          {params.value}
-        </span>
-      ),
-    },
-    {
-      field: "priority",
-      headerName: "Priority",
-      width: 75,
-    },
-    {
-      field: "tags",
-      headerName: "Tags",
-      width: 130,
-    },
-    {
-      field: "startDate",
-      headerName: "Start Date",
-      width: 130,
-    },
-    {
-      field: "dueDate",
-      headerName: "Due Date",
-      width: 130,
-    },
-    {
-      field: "author",
-      headerName: "Author",
-      width: 150,
-      renderCell: (params) => params.value.username || "Unknown",
-    },
-    {
-      field: "assignee",
-      headerName: "Assignee",
-      width: 150,
-      renderCell: (params) => params.value.username || "Unassigned",
-    },
-  ];
+  {
+    field: "title",
+    headerName: "Title",
+    width: 100,
+  },
+  {
+    field: "description",
+    headerName: "Description",
+    width: 200,
+  },
+  {
+    field: "status",
+    headerName: "Status",
+    width: 130,
+    renderCell: (params) => (
+      <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
+        {params.value}
+      </span>
+    ),
+  },
+  {
+    field: "priority",
+    headerName: "Priority",
+    width: 75,
+  },
+  {
+    field: "tags",
+    headerName: "Tags",
+    width: 130,
+  },
+  {
+    field: "startDate",
+    headerName: "Start Date",
+    width: 130,
+  },
+  {
+    field: "dueDate",
+    headerName: "Due Date",
+    width: 130,
+  },
+  {
+    field: "author",
+    headerName: "Author",
+    width: 150,
+    renderCell: (params) => params.value.username || "Unknown",
+  },
+  {
+    field: "assignee",
+    headerName: "Assignee",
+    width: 150,
+    renderCell: (params) => params.value.username || "Unassigned",
+  },
+];
 
-const ReusablePriorityPage = ({priority}: Props) => {
-    const [view, setView] = useState('list');
-    const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
-    const userId = 2;
-    const {
-        data: tasks,
-        isLoading,
-        isError: isTasksError,
-        error
-      } = useGetTasksByUserQuery(userId || 0, {
-        skip: userId === null,
-      });
-    const {isDarkMode} = useAppSelector(state => state.global);
-    const filteredTasks = tasks?.filter(
-        (task: Task) => task.priority === priority,
-      );
-      console.log({isTasksError, tasks, error});
-      
-      if (isTasksError || !tasks) return <div>Error fetching tasks</div>;
+const ReusablePriorityPage = ({ priority }: Props) => {
+  const [view, setView] = useState("list");
+  const [isModalNewTaskOpen, setIsModalNewTaskOpen] = useState(false);
+  const { data: currentUser } = useGetAuthUserQuery({});
+  const userId = currentUser?.userDetails?.userId ?? null;
+  const {
+    data: tasks,
+    isLoading,
+    isError: isTasksError,
+    error,
+  } = useGetTasksByUserQuery(userId || 0, {
+    skip: userId === null,
+  });
+  const { isDarkMode } = useAppSelector((state) => state.global);
+  const filteredTasks = tasks?.filter(
+    (task: Task) => task.priority === priority,
+  );
+  console.log({ isTasksError, tasks, error });
+
+  if (isTasksError || !tasks) return <div>Error fetching tasks</div>;
   return (
     <div className="m-5 p-4">
       <ModalNewTask
